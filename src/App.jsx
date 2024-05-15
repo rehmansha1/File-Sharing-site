@@ -51,14 +51,15 @@ function App() {
     const res = await axios.post(`https://file-sharing-site-server.onrender.com/getFile`, data).then(
       (res) => {
         console.log('dawd')
-setgettingreqreceiver(false);
+        setgettingreqreceiver(false);
+
         setinvalid(false)
+
         return res;
 
       },
       () => {
         console.log('dawd')
-        setgettingreqreceiver(false);
         setinvalid(true);
       }
     );
