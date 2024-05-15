@@ -129,7 +129,7 @@ function App() {
                   {id && (
                     <>
                       {" "}
-                      <div className="idofsender">ID {id}</div>{" "}
+                      <div className="idofsender1">ID {id}</div>{" "}
                       <div id="tooltip">
                         <svg
                           onClick={() => deleteFile(id)}
