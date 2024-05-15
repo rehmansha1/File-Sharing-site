@@ -29,7 +29,7 @@ function App() {
     );
     formData.append("password", enpassword);
 
-    const res = await axios.post("http://localhost:3001/putFile", formData, {
+    const res = await axios.post("https://file-sharing-site-server.onrender.com/putFile", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     console.log(res);
@@ -42,7 +42,7 @@ function App() {
       password,
     };
 
-    const res = await axios.post(`http://localhost:3001/getFile`, data).then(
+    const res = await axios.post(`https://file-sharing-site-server.onrender.com/getFile`, data).then(
       (res) => {
         console.log('dawd')
 
@@ -63,7 +63,7 @@ function App() {
     setreturnedreceiver(true);
   };
   const deleteFile = async (id) => {
-    const res = await axios.post(`http://localhost:3001/deleteFile`, {
+    const res = await axios.post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
       id: id,
     }).then(()=>window.location.reload());
 
