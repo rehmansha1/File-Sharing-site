@@ -16,11 +16,14 @@ function App() {
   const [value, setvalue] = useState(false);
   const [previewFile, setfile] = useState("");
   const [invalid, setinvalid] = useState(false);
+  const [gettingreq, setgettingreq] = useState(false);
+  const [gettingreqreceiver, setgettingreqreceiver] = useState(false);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
   const sendfile = async () => {
+    setgettingreq(true)
     const formData = new FormData();
     formData.append("selectedFile", selectedFile);
     var enpassword = CryptoJS.AES.encrypt(
@@ -32,11 +35,14 @@ function App() {
     const res = await axios.post("https://file-sharing-site-server.onrender.com/putFile", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    console.log(res);
+    
     setid(res.data.id);
-    //rehmanuploader
+    if(res.data.id){
+      setgettingreq(false)
+    }
   };
   const receiveFile = async (id, password) => {
+    setgettingreqreceiver(true)
     const data = {
       id,
       password,
@@ -45,13 +51,14 @@ function App() {
     const res = await axios.post(`https://file-sharing-site-server.onrender.com/getFile`, data).then(
       (res) => {
         console.log('dawd')
-
+setgettingreqreceiver(false);
         setinvalid(false)
         return res;
 
       },
       () => {
         console.log('dawd')
+        setgettingreqreceiver(false);
         setinvalid(true);
       }
     );
@@ -61,6 +68,7 @@ function App() {
     document.body.appendChild(tag);
     tag.click();
     setreturnedreceiver(true);
+    
   };
   const deleteFile = async (id) => {
     const res = await axios.post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
@@ -149,11 +157,11 @@ function App() {
                 <div
                   className="sendbt1"
                   onClick={() => {
-                    console.log(password);
+                    
                     password && previewFile ? sendfile() : null;
                   }}
                 >
-                  Send
+                 { gettingreq ?<svg id="roundandround" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg> : 'Send' }
                 </div>
               </div>
             )}
@@ -207,7 +215,7 @@ function App() {
                   className="sendbt1"
                   onClick={() => idofreciver && passofreciver ? receiveFile(idofreciver, passofreciver) : null }
                 >
-                  Receive
+                                   { gettingreqreceiver ?<svg id="roundandround" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg> : 'Receive' }
                 </div>
               </div>
             )}
