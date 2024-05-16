@@ -20,12 +20,12 @@ function App() {
   const [gettingreqreceiver, setgettingreqreceiver] = useState(false);
 
   const handleFileChange = (event) => {
-    setid('')
+    setid("");
     setSelectedFile(event.target.files[0]);
   };
   const sendfile = async () => {
-    setid('')
-    setgettingreq(true)
+    setid("");
+    setgettingreq(true);
     const formData = new FormData();
     formData.append("selectedFile", selectedFile);
     var enpassword = CryptoJS.AES.encrypt(
@@ -34,55 +34,64 @@ function App() {
     );
     formData.append("password", enpassword);
 
-    const res = await axios.post("https://file-sharing-site-server.onrender.com/putFile", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    
+    const res = await axios.post(
+      "https://file-sharing-site-server.onrender.com/putFile",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
     setid(res.data.id);
-    if(res.data.id){
-      setgettingreq(false)
+    if (res.data.id) {
+      setgettingreq(false);
     }
   };
   const receiveFile = async (id, password) => {
-    setgettingreqreceiver(true)
+    setgettingreqreceiver(true);
     const data = {
       id,
       password,
     };
 
-    const res = await axios.post(`https://file-sharing-site-server.onrender.com/getFile`, data).then(
-      (res) => {
-        console.log('dawd')
-        setgettingreqreceiver(false);
+    const res = await axios
+      .post(`https://file-sharing-site-server.onrender.com/getFile`, data)
+      .then(
+        (res) => {
+          console.log("dawd");
+          setgettingreqreceiver(false);
 
-        setinvalid(false)
+          setinvalid(false);
 
-        return res;
-
-      },
-      () => {
-        console.log('dawd')
-        setinvalid(true);
-      }
-    );
+          return res;
+        },
+        () => {
+          console.log("dawd");
+          setgettingreqreceiver(false)
+          setinvalid(true);
+        }
+      );
 
     const tag = document.createElement("a");
     tag.href = res.data;
     document.body.appendChild(tag);
     tag.click();
     setreturnedreceiver(true);
-    
   };
   const deleteFile = async (id) => {
-    const res = await axios.post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
-      id: id,
-    }).then(()=>window.location.reload());
-
+    const res = await axios
+      .post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
+        id: id,
+      })
+      .then(() => window.location.reload());
   };
-  useEffect( () => {
-    const startup = async()=>{
-const res = await axios.get('https://file-sharing-site-server.onrender.com/');}
-startup();
+  useEffect(() => {
+    const startup = async () => {
+      const res = await axios.get(
+        "https://file-sharing-site-server.onrender.com/"
+      );
+    };
+    startup();
   }, []);
   return (
     <>
@@ -144,7 +153,10 @@ startup();
                   {id && (
                     <>
                       {" "}
-                      <div className="idofsender1">ID {id}</div>{" "}
+                      <div id="pss">
+                        <div className="idofsender1">ID {id}</div>{" "}
+                        
+                      </div>
                       <div id="tooltip">
                         <svg
                           onClick={() => deleteFile(id)}
@@ -164,11 +176,23 @@ startup();
                 <div
                   className="sendbt1"
                   onClick={() => {
-                    
                     password && previewFile ? sendfile() : null;
                   }}
                 >
-                 { gettingreq ?<svg id="roundandround" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg> : 'Send' }
+                  {gettingreq ? (
+                    <svg
+                      id="roundandround"
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#e8eaed"
+                    >
+                      <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
+                    </svg>
+                  ) : (
+                    "Send"
+                  )}
                 </div>
               </div>
             )}
@@ -193,36 +217,48 @@ startup();
                     }}
                   />
                 </div>
-                {invalid ? 
-                <div id="empty">
-                Invalid ID or Password
-                </div>
+                {invalid ? <div id="empty">Invalid ID or Password</div> : null}
 
-                : null}
-                
-                {irr && !invalid &&(
-                    <>
-                      {" "}
-                      <div id="tooltip">
-                        <svg
-                          onClick={() => deleteFile(id)}
-                          id="svgofsender"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#e8eaed"
-                        >
-                          <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                        </svg>
-                      </div>
-                    </>
-                  )}
+                {irr && !invalid && (
+                  <>
+                    {" "}
+                    <div id="tooltip">
+                      <svg
+                        onClick={() => deleteFile(id)}
+                        id="svgofsender"
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="0 -960 960 960"
+                        width="24px"
+                        fill="#e8eaed"
+                      >
+                        <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                      </svg>
+                    </div>
+                  </>
+                )}
                 <div
                   className="sendbt1"
-                  onClick={() => idofreciver && passofreciver ? receiveFile(idofreciver, passofreciver) : null }
+                  onClick={() =>
+                    idofreciver && passofreciver
+                      ? receiveFile(idofreciver, passofreciver)
+                      : null
+                  }
                 >
-                                   { gettingreqreceiver ?<svg id="roundandround" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg> : 'Receive' }
+                  {gettingreqreceiver ? (
+                    <svg
+                      id="roundandround"
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#e8eaed"
+                    >
+                      <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
+                    </svg>
+                  ) : (
+                    "Receive"
+                  )}
                 </div>
               </div>
             )}
