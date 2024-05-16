@@ -40,7 +40,7 @@ const uploadFile = async (file) => {
     name: `${file.originalname}`,
     parents: [process.env.SERVER_GOOGLE_FOLDER_KEY],
   };
-  const fileStream = Readable.from([file.buffer]);
+  const fileStream = fs.createReadStream(file.path);
 
   try {
     const response = await drive.files.create({
@@ -55,6 +55,9 @@ const uploadFile = async (file) => {
     const fileId = response.data.id;
     console.log(response);
     console.log(`${fileId} is Successfully been created on Google Drive`);
+    if ( fileId){
+      fs.unlinkSync(file.path);
+    }
     return fileId.toString();
   } catch (error) {
     throw error;
@@ -279,6 +282,6 @@ async function deleteIfOlderThanTwoHours() {
 }
 
 setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
-app.listen("3002", () => {
-  console.log(`Server is running on port 3002`);
+app.listen("3001", () => {
+  console.log(`Server is running on port 3001`);
 });
