@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import multer from "multer";
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ dest: 'uploads' });
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { google } from "googleapis";
@@ -163,7 +163,7 @@ db.once("open", () => {
   console.log("Connected to the DB");
 });
 app.get("/", async (req, res) => {
-  res.send("?");
+  res.send("test");
 });
 
 app.post("/putFile", upload.single("selectedFile"), async (req, res) => {
@@ -242,7 +242,6 @@ app.post("/getFile", async (req, res) => {
 });
 
 app.post("/deleteFile", async (req, res) => {
-  console.log('came')
   const id = req.body.id;
   const foundDocument = await file.findById(id).then((file)=>{return file;}, () => {res.status(404).json({ message: "Invalid ID" }); return null; })
   if(foundDocument){
@@ -280,6 +279,6 @@ async function deleteIfOlderThanTwoHours() {
 }
 
 setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
-app.listen("3001", () => {
-  console.log(`Server is running on port 3001`);
+app.listen("3002", () => {
+  console.log(`Server is running on port 3002`);
 });
