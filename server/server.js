@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import multer from "multer";
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ dest: 'uploads' });
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { google } from "googleapis";
@@ -40,7 +40,7 @@ const uploadFile = async (file) => {
     name: `${file.originalname}`,
     parents: [process.env.SERVER_GOOGLE_FOLDER_KEY],
   };
-  const fileStream = Readable.from([file.buffer]);
+  const fileStream = fs.createReadStream(file.path);
 
   try {
     const response = await drive.files.create({
@@ -55,6 +55,9 @@ const uploadFile = async (file) => {
     const fileId = response.data.id;
     console.log(response);
     console.log(`${fileId} is Successfully been created on Google Drive`);
+    if ( fileId){
+      fs.unlinkSync(file.path);
+    }
     return fileId.toString();
   } catch (error) {
     throw error;
