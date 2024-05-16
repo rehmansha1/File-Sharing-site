@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -20,9 +20,11 @@ function App() {
   const [gettingreqreceiver, setgettingreqreceiver] = useState(false);
 
   const handleFileChange = (event) => {
+    setid('')
     setSelectedFile(event.target.files[0]);
   };
   const sendfile = async () => {
+    setid('')
     setgettingreq(true)
     const formData = new FormData();
     formData.append("selectedFile", selectedFile);
@@ -77,7 +79,11 @@ function App() {
     }).then(()=>window.location.reload());
 
   };
-
+  useEffect( () => {
+    const startup = async()=>{
+const res = await axios.get('https://file-sharing-site-server.onrender.com/');}
+startup();
+  }, []);
   return (
     <>
       <div id="wholepage">

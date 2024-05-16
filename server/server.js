@@ -226,7 +226,7 @@ app.post("/getFile", async (req, res) => {
     );
     var storedpassword = pass2decrybytes.toString(CryptoJS.enc.Utf8);
     if (password === storedpassword) {
-      console.log("IT IS THE SAME FUCK YES");
+      console.log("IT IS THE SAME FY");
       try {
         const responsefile = await downloadFile(
           
