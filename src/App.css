@@ -200,6 +200,7 @@ animation: rotate 0.5s infinite;
 #svgofsender {
   fill: black;
   transition: fill 0.2s;
+  cursor: pointer;
 }
 #svgofsender:hover {
   fill: red;
@@ -229,8 +230,15 @@ animation: rotate 0.5s infinite;
 }
 #empty {
   font-family: "Montserrat";
+  font-size: 15px;
+  text-align: center;
 }
 @media only screen and (max-width: 768px) {
+  #empty {
+    font-family: "Montserrat";
+    font-size: 1.2vh;
+    text-align: center;
+  }
   .h1sender {
     font-size: 20px;
   }
@@ -333,6 +341,9 @@ animation: rotate 0.5s infinite;
     font-size: 1.2vh;
     text-align: center;
   }
+  #svgofsender{
+    cursor: pointer;
+  }
   #tooltip::after {
     content: "Remove from server";
     position: absolute;
@@ -359,4 +370,11 @@ padding-top: 0px;
 padding-bottom: 0px;
 
 }
+}
+#pss{
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content:center ;
+  
 }

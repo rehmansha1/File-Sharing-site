@@ -171,15 +171,17 @@ app.get("/", async (req, res) => {
 
 app.post("/putFile", upload.single("selectedFile"), async (req, res) => {
   try {
+    const originalname = req.file.originalname;
     const k = await uploadFile(req.file);
     if (typeof(k) == "string") {
       const f = await file.create({
-        originalname: req.file.originalname,
+        originalname: originalname,
         password: req.body.password,
         googledriveid: k,
         downloadCount: 0,
       });
-      console.log(`sent to mongo ${req.file.originalname}`);
+      
+      console.log(`sent to mongo ${originalname}`);
       const id = f.id;
       res.status(201).json({
         message: "it been saved to server and to google drive",
@@ -224,7 +226,7 @@ app.post("/getFile", async (req, res) => {
     );
     var storedpassword = pass2decrybytes.toString(CryptoJS.enc.Utf8);
     if (password === storedpassword) {
-      console.log("IT IS THE SAME FUCK YES");
+      console.log("IT IS THE SAME FY");
       try {
         const responsefile = await downloadFile(
           
@@ -281,7 +283,8 @@ async function deleteIfOlderThanTwoHours() {
   }
 }
 
-setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
+setInterval(deleteIfOlderThanTwoHours, 2 * 60 * 60 * 1000);
+
 app.listen("3001", () => {
   console.log(`Server is running on port 3001`);
 });
