@@ -171,15 +171,17 @@ app.get("/", async (req, res) => {
 
 app.post("/putFile", upload.single("selectedFile"), async (req, res) => {
   try {
+    const originalname = req.file.originalname;
     const k = await uploadFile(req.file);
     if (typeof(k) == "string") {
       const f = await file.create({
-        originalname: req.file.originalname,
+        originalname: originalname,
         password: req.body.password,
         googledriveid: k,
         downloadCount: 0,
       });
-      console.log(`sent to mongo ${req.file.originalname}`);
+      
+      console.log(`sent to mongo ${originalname}`);
       const id = f.id;
       res.status(201).json({
         message: "it been saved to server and to google drive",
