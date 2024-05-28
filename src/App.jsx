@@ -67,7 +67,7 @@ function App() {
         },
         () => {
           console.log("dawd");
-          setgettingreqreceiver(false)
+          setgettingreqreceiver(false);
           setinvalid(true);
         }
       );
@@ -92,31 +92,31 @@ function App() {
       );
     };
     startup();
-
-
   }, []);
   return (
     <>
       <div id="wholepage">
         <div id="box">
-          <div
-            id="sender"
-            onClick={() => {
-              const sender = document.getElementById("sender");
-              const receiver = document.getElementById("receiver");
-              sender.classList.toggle("active");
-
-              receiver.classList.toggle("active");
-              setTimeout(() => setvalue(!value), 250);
-            }}
-          >
+          <div id="sender">
             <div id="outerwelcomebox">
               <div id="innerwelcomebox">
                 <div id="welcomebox">Welcome to File Sharing Web</div>
                 {!value && <div> want to receive a file? </div>}
                 {value && <div> want to send a file? </div>}
               </div>
-              <div className="sendbt12">{!value ? "Receive" : "Send"}</div>
+              <div
+                className="sendbt12"
+                onClick={() => {
+                  const sender = document.getElementById("sender");
+                  const receiver = document.getElementById("receiver");
+                  sender.classList.toggle("active");
+
+                  receiver.classList.toggle("active");
+                  setTimeout(() => setvalue(!value), 250);
+                }}
+              >
+                {!value ? "Receive" : "Send"}
+              </div>
             </div>
           </div>
           <div id="receiver">
@@ -124,14 +124,7 @@ function App() {
               <div className="senderbox">
                 <div className="h1sender">Sender</div>
                 <div className="nox">
-                  <input
-                    className="inputboxsender"
-                    placeholder="Create Password "
-                    value={password}
-                    onChange={(event) => {
-                      setPassword(event.target.value);
-                    }}
-                  />
+                  
                   <input
                     type="file"
                     name="file"
@@ -143,6 +136,14 @@ function App() {
                     }}
                   />
                   <label for="file">Choose a file</label>
+                  <input
+                    className="inputboxsender"
+                    placeholder="Create Password "
+                    value={password}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                    }}
+                  />
                   {previewFile && (
                     <div className="idofsender">
                       {previewFile.split(".")[0].length > 14
@@ -157,7 +158,6 @@ function App() {
                       {" "}
                       <div id="pss">
                         <div className="idofsender1">ID {id}</div>{" "}
-                        
                       </div>
                       <div id="tooltip">
                         <svg
