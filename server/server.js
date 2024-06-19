@@ -38,7 +38,6 @@ const uploadFile = async (file) => {
   const drive = google.drive({ version: "v3", auth: authClient });
   const fileMetaData = {
     name: `${file.originalname}`,
-    parents: [process.env.SERVER_GOOGLE_FOLDER_KEY],
   };
   const fileStream = fs.createReadStream(file.path);
 
