@@ -74,8 +74,10 @@ function App() {
 
     const tag = document.createElement("a");
     tag.href = res.data;
+    tag.style.display = 'none'; 
     document.body.appendChild(tag);
     tag.click();
+    document.body.removeChild(tag); 
     setreturnedreceiver(true);
   };
   const deleteFile = async (id) => {

@@ -11,7 +11,7 @@ import apikeys from "./apikeys.json" assert { type: "json" };
 import { fileTypeFromFile } from "file-type";
 import { Readable } from "stream";
 import CryptoJS from "crypto-js";
-
+import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -35,34 +35,47 @@ async function authorize() {
 const authClient = await authorize();
 
 const uploadFile = async (file) => {
-  const drive = google.drive({ version: "v3", auth: authClient });
-  const fileMetaData = {
-    name: `${file.originalname}`,
-    parents: [process.env.SERVER_GOOGLE_FOLDER_KEY],
-  };
-  const fileStream = fs.createReadStream(file.path);
-
   try {
+    if (!fs.existsSync(file.path)) {
+      throw new Error(`File not found: ${file.path}`);
+    }
+
+    const drive = google.drive({ version: "v3", auth: authClient });
+
+    const fileMetaData = {
+      name: file.originalname,
+    };
+
+    const fileStream = fs.createReadStream(file.path);
+
     const response = await drive.files.create({
       resource: fileMetaData,
       media: {
         body: fileStream,
-        mimeType: file.mimeType,
+        mimeType: file.mimetype,
       },
       fields: "id",
     });
 
     const fileId = response.data.id;
     console.log(response);
-    console.log(`${fileId} is Successfully been created on Google Drive`);
-    if ( fileId){
+    console.log(`${fileId} has been successfully created on Google Drive`);
+
+    if (fileId) {
       fs.unlinkSync(file.path);
     }
+
     return fileId.toString();
+
   } catch (error) {
+    console.error('Error uploading file:', error.message);
+    if (error.response && error.response.data) {
+      console.error('Error details:', error.response.data);
+    }
     throw error;
   }
 };
+
 
 /*
 async function uploadFile(authClient,file){
@@ -97,8 +110,7 @@ async function uploadFile(authClient,file){
 }*/
 
 async function downloadFile(id) {
-  // Get credentials and build service
-  // TODO (developer) - Use appropriate auth mechanism for your app
+
 
   const service = google.drive({ version: "v3", auth: authClient });
 
@@ -113,7 +125,6 @@ async function downloadFile(id) {
     });
     return file;
   } catch (err) {
-    // TODO(developer) - Handle error
     throw err;
   }
 }
@@ -125,6 +136,10 @@ const File = new mongoose.Schema({
   },
   password: {
     type: String,
+    required: true,
+  },
+  fileid:{
+    type:String,
     required: true,
   },
   googledriveid: {
@@ -171,12 +186,16 @@ app.get("/", async (req, res) => {
 
 app.post("/putFile", upload.single("selectedFile"), async (req, res) => {
   try {
+
     const originalname = req.file.originalname;
+    console.log(originalname)
+    const fileid = uuidv4().slice(0,5);
     const k = await uploadFile(req.file);
     if (typeof(k) == "string") {
       const f = await file.create({
         originalname: originalname,
         password: req.body.password,
+        fileid:fileid,
         googledriveid: k,
         downloadCount: 0,
       });
@@ -185,7 +204,7 @@ app.post("/putFile", upload.single("selectedFile"), async (req, res) => {
       const id = f.id;
       res.status(201).json({
         message: "it been saved to server and to google drive",
-        id: id,
+        id: fileid,
       });
     } else {
       console.log("error or something");
@@ -209,11 +228,14 @@ res.json({ url:blo });*/
 });
 app.post("/getFile", async (req, res) => {
   const id = req.body.id;
-
+  const foundDocument = await file.findOne({ fileid: id }).then((file) => {
+    return file;
+});
+  /*
   const foundDocument = await file.findById(id).then(
     (file) => {return file},
     () => {res.status(404).json({ message: "Invalid ID" }); return null; })
-  
+  */
   if (foundDocument) {
 
     const password = req.body.password;
