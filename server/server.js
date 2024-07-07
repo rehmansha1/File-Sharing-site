@@ -334,11 +334,12 @@ const e = Object.keys(s.data.files).length;
     console.log(i[id])
   }*/
 //deleteFILE(s.data.files[0].id)
-  //30b31
-  //d
+
 }
 
 setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
+
+
 app.listen("3001", () => {
   console.log(`Server is running on port 3001`);
 });
