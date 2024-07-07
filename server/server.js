@@ -338,15 +338,7 @@ const e = Object.keys(s.data.files).length;
   //d
 }
 
-//https://drive.usercontent.google.com/download?id=1yJbxeCQqXULYglnBnM1YXZDW02b7_ZGA&export=download&authuser=0
-//https://drive.usercontent.google.com/download?id=1LlfA0VbK28r7kjGRHQZTw7DPcKdSvbv1&export=download&authuser=0
-//e22d9 pass d
-//console.log(getallfiles());
-//https://drive.usercontent.google.com/download?id=1gFSVwiz_CpZwbYkyz9tRyuQa7xYI4cUK&export=download&authuser=0
 setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
-deleteIfOlderThanTwoHours()
-getallfiles()
-
 app.listen("3001", () => {
   console.log(`Server is running on port 3001`);
 });
