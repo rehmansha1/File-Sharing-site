@@ -79,7 +79,7 @@
   transform: translateX(-100%);
 }
 .senderbox {
-  height: 90%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,7 +263,7 @@ animation: rotate 0.5s infinite;
     font-size: 1.5vh;
   }
   .senderbox {
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -300,7 +300,7 @@ animation: rotate 0.5s infinite;
     font-size: 1vh;
   }
   #outerwelcomebox {
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -363,7 +363,6 @@ animation: rotate 0.5s infinite;
     opacity: 0;
   }
 .idofsender1{
-  font-family: "Montserrat";
 font-size: 1.1vh;
 text-align: center;
 padding: 13px;
@@ -377,5 +376,43 @@ padding-bottom: 0px;
   gap: 15px;
   align-items: center;
   justify-content:center ;
+
   
+}
+#copy{
+  cursor: pointer;
+}
+#copyclass{
+  display: flex;
+  position: relative;
+
+}
+#copyclass::after{
+
+  position: absolute;
+left: 110%;
+opacity: 1;
+background-color: transparent;
+color: black;
+font-family: "Montserrat";
+transition: all 0.3s;
+display: flex;
+align-items:center ;
+
+}
+#copyclass:hover::after{
+  opacity: 1;
+  left: 110%;
+
+}
+#copyclass:hover > #copy{
+  fill: #838486;
+}
+#f{
+  font-family: "Montserrat";
+position: absolute;
+opacity: 0;
+left: 110%;
+transition: all 0.3s;
+top: 1px;
 }

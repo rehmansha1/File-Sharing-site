@@ -4,6 +4,7 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -18,6 +19,8 @@ function App() {
   const [invalid, setinvalid] = useState(false);
   const [gettingreq, setgettingreq] = useState(false);
   const [gettingreqreceiver, setgettingreqreceiver] = useState(false);
+  const [copyStatus, setCopyStatus] = useState(false);
+  const [textToCopy, setTextToCopy] = useState("");
 
   const handleFileChange = (event) => {
     setid("");
@@ -74,10 +77,10 @@ function App() {
 
     const tag = document.createElement("a");
     tag.href = res.data;
-    tag.style.display = 'none'; 
+    tag.style.display = "none";
     document.body.appendChild(tag);
     tag.click();
-    document.body.removeChild(tag); 
+    document.body.removeChild(tag);
     setreturnedreceiver(true);
   };
   const deleteFile = async (id) => {
@@ -85,8 +88,10 @@ function App() {
       .post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
         id: id,
       })
-      .then(() => window.location.reload());
-  };
+      .then(setreturnedreceiver(false));
+  
+    };
+
   useEffect(() => {
     const startup = async () => {
       const res = await axios.get(
@@ -126,7 +131,6 @@ function App() {
               <div className="senderbox">
                 <div className="h1sender">Sender</div>
                 <div className="nox">
-                  
                   <input
                     type="file"
                     name="file"
@@ -159,9 +163,40 @@ function App() {
                     <>
                       {" "}
                       <div id="pss">
-                        <div className="idofsender1">ID {id}</div>{" "}
+                        <div className="idofsender1" id="idofsender642">
+                          ID {id}
+                        </div>
+                        <CopyToClipboard
+                          text={id}
+                          onCopy={() => {
+                            document.getElementById("f").style.opacity = "1";
+                            setTimeout(
+                              () =>
+                                (document.getElementById("f").style.opacity =
+                                  " 0"),
+                              2000
+                            );
+                          }}
+                        >
+                          <div id="copyclass">
+                            <svg
+                              id="copy"
+                              onClick={() => {
+                        
+                              }}
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="24px"
+                              viewBox="0 -960 960 960"
+                              width="24px"
+                              fill="#A2A4A7"
+                            >
+                              <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z" />
+                            </svg>{" "}
+                            <div id="f">Copied!</div>
+                          </div>
+                        </CopyToClipboard>
                       </div>
-                      <div id="tooltip">
+                      {/* <div id="tooltip">
                         <svg
                           onClick={() => deleteFile(id)}
                           id="svgofsender"
@@ -174,6 +209,7 @@ function App() {
                           <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
                         </svg>
                       </div>
+                     */}
                     </>
                   )}
                 </div>
@@ -228,7 +264,7 @@ function App() {
                     {" "}
                     <div id="tooltip">
                       <svg
-                        onClick={() => deleteFile(id)}
+                        onClick={() => deleteFile(idofreciver)}
                         id="svgofsender"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
