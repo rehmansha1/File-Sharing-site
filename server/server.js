@@ -307,7 +307,7 @@ async function deleteIfOlderThanTwoHours() {
     const ageInMilliseconds = currentTime - createdAt;
     const ageInHours = (ageInMilliseconds / (1000 * 60 * 60)).toFixed(1);
 
-    if (parseFloat(ageInHours) >= 0) {
+    if (parseFloat(ageInHours) >= 2) {
       //await file.deleteOne({ googledriveid: document.googledriveid });
       await deleteFILE(document.googledriveid)
       console.log(`${index} got deleted`);
