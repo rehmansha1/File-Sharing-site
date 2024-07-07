@@ -216,7 +216,7 @@ function App() {
                 <div
                   className="sendbt1"
                   onClick={() => {
-                    password && previewFile ? sendfile() : null;
+                    password.trim() && previewFile ? sendfile() : null;
                   }}
                 >
                   {gettingreq ? (
