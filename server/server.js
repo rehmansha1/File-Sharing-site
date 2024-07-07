@@ -12,6 +12,7 @@ import { fileTypeFromFile } from "file-type";
 import { Readable } from "stream";
 import CryptoJS from "crypto-js";
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -125,6 +126,7 @@ async function downloadFile(id) {
     });
     return file;
   } catch (err) {
+    console.log(err)
     throw err;
   }
 }
@@ -158,6 +160,7 @@ const File = new mongoose.Schema({
 });
 
 const file = mongoose.model("Files", File);
+
 const deleteFILE = async (id) => {
   const drive = google.drive({ version: "v3", auth: authClient });
 
@@ -165,8 +168,10 @@ const deleteFILE = async (id) => {
     .delete({
       fileId: id,
     })
-    .then(async () => {
+    .then(async (res) => {
+      
       const deletedDocument = await file.deleteOne({ googledriveid: id });
+      
       console.log(deletedDocument);
       return deletedDocument
     });
@@ -236,8 +241,11 @@ app.post("/getFile", async (req, res) => {
     (file) => {return file},
     () => {res.status(404).json({ message: "Invalid ID" }); return null; })
   */
+ if (!foundDocument){
+  res.status(404).json({ message: "Invalid ID" });
+  
+ }
   if (foundDocument) {
-
     const password = req.body.password;
 
     foundDocument.downloadCount += 1;
@@ -254,6 +262,7 @@ app.post("/getFile", async (req, res) => {
           
           foundDocument.googledriveid
         );
+        console.log('from downloadFile',responsefile.status,'status')
         res.status(200).json(responsefile.data.webContentLink);
       } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -271,9 +280,10 @@ app.post("/getFile", async (req, res) => {
 app.post("/deleteFile", async (req, res) => {
   console.log('came')
   const id = req.body.id;
-  const foundDocument = await file.findById(id).then((file)=>{return file;}, () => {res.status(404).json({ message: "Invalid ID" }); return null; })
+  console.log(id);
+  const foundDocument = await file.findOne({ fileid: id }).then((file)=>{return file;}, () => {res.status(404).json({ message: "Invalid ID" }); return null; })
   if(foundDocument){
-  console.log(foundDocument.googledriveid);
+  console.log(foundDocument);
   deleteFILE(foundDocument.googledriveid).then(
     () => {
       console.log("deleted successfully");
@@ -297,16 +307,45 @@ async function deleteIfOlderThanTwoHours() {
     const ageInMilliseconds = currentTime - createdAt;
     const ageInHours = (ageInMilliseconds / (1000 * 60 * 60)).toFixed(1);
 
-    if (parseFloat(ageInHours) >= 2) {
-      await file.deleteOne({ googledriveid: document.googledriveid });
+    if (parseFloat(ageInHours) >= 0) {
+      //await file.deleteOne({ googledriveid: document.googledriveid });
+      await deleteFILE(document.googledriveid)
       console.log(`${index} got deleted`);
     } else {
       console.log(`${index} is ${ageInHours} hrs old`);
     }
   }
 }
+const getallfiles = async()=>{
+const drive = google.drive({ version: "v3", auth: authClient });
+const s = await drive.files.list({pageSize:500});
 
+
+const e = Object.keys(s.data.files).length;
+//for (let i =0; i<s.data.files.length; i++){
+
+  console.log(s.data.files)
+  console.log(e)
+ /* const s1 = s.data.files
+  for(let i =0; i<s1.length; i++){
+    deleteFILE(s1[i].id)
+  }*/
+ /* for(var j in s.data.files[i]){
+    console.log(i[id])
+  }*/
+//deleteFILE(s.data.files[0].id)
+  //30b31
+  //d
+}
+
+//https://drive.usercontent.google.com/download?id=1yJbxeCQqXULYglnBnM1YXZDW02b7_ZGA&export=download&authuser=0
+//https://drive.usercontent.google.com/download?id=1LlfA0VbK28r7kjGRHQZTw7DPcKdSvbv1&export=download&authuser=0
+//e22d9 pass d
+//console.log(getallfiles());
+//https://drive.usercontent.google.com/download?id=1gFSVwiz_CpZwbYkyz9tRyuQa7xYI4cUK&export=download&authuser=0
 setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
+deleteIfOlderThanTwoHours()
+getallfiles()
 
 app.listen("3001", () => {
   console.log(`Server is running on port 3001`);
