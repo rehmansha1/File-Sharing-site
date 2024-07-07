@@ -178,6 +178,14 @@ cursor: pointer;
   transition: all 0.5s;
 animation: rotate 0.5s infinite;
 }
+#f{
+  font-family: "Montserrat";
+position: absolute;
+opacity: 0;
+left: 110%;
+transition: all 0.3s;
+top: 1px;
+}
 @keyframes rotate {
   0%{
     transform: rotate(0deg);
@@ -211,6 +219,7 @@ animation: rotate 0.5s infinite;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s;
 }
 #tooltip::after {
   content: "Remove from server";
@@ -233,6 +242,14 @@ animation: rotate 0.5s infinite;
   font-family: "Montserrat";
   font-size: 15px;
   text-align: center;
+}
+#pss{
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content:center ;
+
+  
 }
 @media only screen and (max-width: 768px) {
   #empty {
@@ -339,22 +356,44 @@ animation: rotate 0.5s infinite;
   }
   .idofsender {
     font-family: "Montserrat";
-    font-size: 1.2vh;
+    font-size: 1.5vh;
     text-align: center;
   }
   #svgofsender{
     cursor: pointer;
+    scale:1.3;
+  }
+  #tooltip {
+    
   }
   #tooltip::after {
-    content: "Remove from server";
+    content: "Remove from server?";
     position: absolute;
-    top: 20%;
-    left: 0%;
+    top: 100px;
+    left: 100px;
     white-space: nowrap;
-    font-size: 14px;
+    font-size: 1.5vh;
     opacity: 0;
     transition: all 0.5s;
     font-family: "Montserrat";
+
+    animation: casd 0.5s both;
+  }
+  @keyframes casd {
+    0%{
+      opacity: 0;
+      top:0%;
+      left: -200%;
+      white-space: nowrap;
+
+
+    }
+    100%{
+      top: 110%;
+      left: -200%;
+      white-space: nowrap;
+      opacity: 1;
+    }
   }
   #tooltip:hover::after {
     top: 20%;
@@ -362,23 +401,34 @@ animation: rotate 0.5s infinite;
     white-space: nowrap;
     opacity: 0;
   }
-.idofsender1{
-font-size: 1.1vh;
-text-align: center;
-padding: 13px;
-padding-top: 0px;
-padding-bottom: 0px;
+  .idofsender1{
+  font-size: 1.5vh;
+  text-align: center;
+  text-wrap: nowrap;
+  padding-top: 0px;
+  padding-bottom: 0px;
 
-}
-}
-#pss{
+  } 
+  #pss{
   display: flex;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
   justify-content:center ;
+  font-size: 1.5vh;
+  }
+  #f{
+    font-family: "Montserrat";
+  position: absolute;
+  opacity: 0;
+    top: 110%;
 
+  left: -20%;
+  font-size: 1.1vh;
+  transition: all 0.3s;
   
+  }
 }
+
 #copy{
   cursor: pointer;
 }
@@ -407,12 +457,4 @@ align-items:center ;
 }
 #copyclass:hover > #copy{
   fill: #838486;
-}
-#f{
-  font-family: "Montserrat";
-position: absolute;
-opacity: 0;
-left: 110%;
-transition: all 0.3s;
-top: 1px;
 }

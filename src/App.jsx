@@ -152,9 +152,9 @@ function App() {
                   />
                   {previewFile && (
                     <div className="idofsender">
-                      {previewFile.split(".")[0].length > 14
+                      {previewFile.split(".")[0].length > 22
                         ? previewFile.split(".")[0].slice(0, 10) +
-                          ".. ." +
+                          "..." +
                           previewFile.split(".")[1]
                         : previewFile}
                     </div>
