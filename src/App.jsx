@@ -32,7 +32,7 @@ function App() {
     const formData = new FormData();
     formData.append("selectedFile", selectedFile);
     var enpassword = CryptoJS.AES.encrypt(
-      password,
+      password.trim(),
       import.meta.env.VITE_ENCRPYT_KEY_ENV
     );
     formData.append("password", enpassword);
