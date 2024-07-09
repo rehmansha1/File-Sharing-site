@@ -5,6 +5,8 @@ import "./App.css";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import JSZip from "jszip";
+import { saveAs } from 'file-saver';
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,9 +24,20 @@ function App() {
   const [copyStatus, setCopyStatus] = useState(false);
   const [textToCopy, setTextToCopy] = useState("");
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async(event) => {
     setid("");
-    setSelectedFile(event.target.files[0]);
+  if (event.target.files.length > 1){
+    const zip = new JSZip();
+  for (var i = 0; i<event.target.files.length; i++){
+      zip.file((event.target.files[i]).name,event.target.files[i])
+  }
+  let content = await zip.generateAsync({ type: 'blob' });
+  const zipFile = new File([content],`${(event.target.files[0].name).split('.')[0]}`, { type: 'application/zip' });
+  setSelectedFile(zipFile);
+  }
+  else{
+  setSelectedFile(event.target.files[0]);
+  }
   };
   const sendfile = async () => {
     setid("");
@@ -136,9 +149,11 @@ function App() {
                     name="file"
                     id="file"
                     class="inputfile"
+                    multiple
                     onChange={(event) => {
                       handleFileChange(event);
-                      setfile(event.target.files[0].name);
+             
+                  setfile(event.target.files[0].name);
                     }}
                   />
                   <label for="file">Choose a file</label>
@@ -152,13 +167,15 @@ function App() {
                   />
                   {previewFile && (
                     <div className="idofsender">
+                  
                       {previewFile.split(".")[0].length > 22
-                        ? previewFile.split(".")[0].slice(0, 10) +
+                        ? (previewFile.split(".")[0].slice(0, 10) +
                           "..." +
-                          previewFile.split(".")[1]
-                        : previewFile}
+                          previewFile.split(".")[1] ) 
+                        : previewFile }
                     </div>
                   )}
+                
                   {id && (
                     <>
                       {" "}
