@@ -337,7 +337,7 @@ const e = Object.keys(s.data.files).length;
 
 }
 
-setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
+//setInterval(deleteIfOlderThanTwoHours, 10 * 60 * 1000);
 
 
 app.listen("3001", () => {
