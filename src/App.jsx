@@ -276,12 +276,12 @@ function App() {
                 </div>
                 {invalid ? <div id="empty">Invalid ID or Password</div> : null}
 
-                {/*irr && !invalid && (
+                {irr && !invalid && (
                   <>
                     {" "}
                     <div id="tooltip">
                       <svg
-                        onClick={() => deleteFile(idofreciver)}
+                       // onClick={() => deleteFile(idofreciver)}
                         id="svgofsender"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
@@ -293,7 +293,7 @@ function App() {
                       </svg>
                     </div>
                   </>
-                )*/}
+                )}
                 <div
                   className="sendbt1"
                   onClick={() =>
