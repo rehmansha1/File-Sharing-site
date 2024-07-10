@@ -276,7 +276,7 @@ function App() {
                 </div>
                 {invalid ? <div id="empty">Invalid ID or Password</div> : null}
 
-                {irr && !invalid && (
+                {/*irr && !invalid && (
                   <>
                     {" "}
                     <div id="tooltip">
@@ -293,7 +293,7 @@ function App() {
                       </svg>
                     </div>
                   </>
-                )}
+                )*/}
                 <div
                   className="sendbt1"
                   onClick={() =>
