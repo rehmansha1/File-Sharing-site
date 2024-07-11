@@ -281,7 +281,7 @@ function App() {
                     {" "}
                     <div id="tooltip">
                       <svg
-                       // onClick={() => deleteFile(idofreciver)}
+                       onClick={() => deleteFile(idofreciver)}
                         id="svgofsender"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
