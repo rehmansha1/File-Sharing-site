@@ -7,10 +7,8 @@ import CryptoJS from "crypto-js";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import JSZip from "jszip";
 import { saveAs } from 'file-saver';
-import { clarity } from 'react-microsoft-clarity';
 
 function App() {
-  clarity.init(import.meta.env.VITE_CLARITY_KEY_ENV);
   const [selectedFile, setSelectedFile] = useState(null);
   const [password, setPassword] = useState("");
   const [passofreciver, setPassofreciver] = useState("");
