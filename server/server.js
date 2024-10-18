@@ -13,8 +13,10 @@ import { Readable } from "stream";
 import CryptoJS from "crypto-js";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
+import { job } from './cron.js';
 dotenv.config();
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 mongoose.connect(process.env.SERVER_FMID_KEY, {
@@ -283,7 +285,6 @@ app.post("/deleteFile", async (req, res) => {
   console.log(id);
   const foundDocument = await file.findOne({ fileid: id }).then((file)=>{return file;}, () => {res.status(404).json({ message: "Invalid ID" }); return null; })
   if(foundDocument){
-  console.log(foundDocument);
   deleteFILE(foundDocument.googledriveid).then(
     () => {
       console.log("deleted successfully");
@@ -323,8 +324,6 @@ const s = await drive.files.list({pageSize:500});
 
 const e = Object.keys(s.data.files).length;
 //for (let i =0; i<s.data.files.length; i++){
-
-  console.log(s.data.files)
   console.log(e)
  /* const s1 = s.data.files
   for(let i =0; i<s1.length; i++){
