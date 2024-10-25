@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+
+#confirmbox{
+    height: 215px;
+    width: 510px;
+    position: fixed;
+    background-color: black;
+    display: flex;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1234234;
+  border-radius: 3%;
+  color: white;
+  font-family: "Montserrat";
+  flex-direction: column;
+  animation: upup 0.5s both;
+  opacity: 0;
+  padding: 50px;
+}
+@keyframes upup {
+    0%{
+        top: 60%;
+        opacity: 0;
+    }
+    100%{
+        top: 50%;
+        opacity: 1;
+    }
+}
+@keyframes downdown {
+    0%{
+        top: 50%;
+        opacity: 1; 
+    }
+    100%{ 
+        top: 60%;
+        opacity: 0;
+    }
+}
+.yesorno{
+    display: flex;
+    flex-direction: row;
+    gap: 50%;
+    padding-top: 50px;
+    justify-content: center;
+
+}
+.yesorno > div, .yesorno > a {
+scale: 1.4;
+cursor: pointer;
+text-decoration: none;
+color: white;
+
+}
+
+.yesorno > div:hover{
+    color: gold;
+}

@@ -6,49 +6,96 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import JSZip from "jszip";
-import { saveAs } from 'file-saver';
-
+import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+import ConfirmBox from "./components/ConfirmBox";
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [password, setPassword] = useState("");
-  const [passofreciver, setPassofreciver] = useState("");
-  const [idofreciver, setidofreciver] = useState("");
-  const [irr, setreturnedreceiver] = useState(false);
-  const [id, setid] = useState("");
-  const [typeofurl, settypeofurl] = useState("");
-  const [value, setvalue] = useState(false);
+  const [senderPassword, setSenderPassword] = useState("");
+  const [receiverPassword, setReceiverPassword] = useState("");
+  const [receiverId, setReceiverId] = useState("");
+  const [isReceiverReturned, setIsReceiverReturned] = useState(false);
+  const [id, setId] = useState("");
+  const [isSender, setIsSender] = useState(false);
   const [previewFile, setfile] = useState("");
   const [invalid, setinvalid] = useState(false);
-  const [gettingreq, setgettingreq] = useState(false);
-  const [gettingreqreceiver, setgettingreqreceiver] = useState(false);
+  const [isRequestInProgressForSender, setIsRequestInProgressForSender] = useState(false);
+  const [IsRequestInProgressForReceiver, setIsRequestInProgressForReceiver] = useState(false);
   const [copyStatus, setCopyStatus] = useState(false);
+  const [isTextOptionOn, setTextOption] = useState(false);
+  const [textOptionInput,settextOptionInput] = useState("");
   const [textToCopy, setTextToCopy] = useState("");
+  const [confirmBoxAlive, setConfirmBoxAlive] = useState(false);
+  const [confirmBoxContents, setConfirmBoxContents] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const handleFileChange = async(event) => {
-    setid("");
-  if (event.target.files.length > 1){
-    const zip = new JSZip();
-  for (var i = 0; i<event.target.files.length; i++){
-      zip.file((event.target.files[i]).name,event.target.files[i])
-  }
-  let content = await zip.generateAsync({ type: 'blob' });
-  const zipFile = new File([content],`${(event.target.files[0].name).split('.')[0]}`, { type: 'application/zip' });
-  setSelectedFile(zipFile);
-  }
-  else{
-  setSelectedFile(event.target.files[0]);
-  }
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    
+    }
+    handleResize();
+  },[]);
+  useEffect(() => {
+    const setVhUnit = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+
+    setVhUnit(); // Set on load
+    window.addEventListener('resize', setVhUnit); // Update on resize
+
+    // Clean up the event listener on component unmount
+    return () => window.removeEventListener('resize', setVhUnit);
+  }, []);
+  const handleFileChange = async (event) => {
+    setId("");
+    if (event.target.files.length > 1) {
+      const zip = new JSZip();
+      for (var i = 0; i < event.target.files.length; i++) {
+        zip.file(event.target.files[i].name, event.target.files[i]);
+      }
+      let content = await zip.generateAsync({ type: "blob" });
+      const zipFile = new File(
+        [content],
+        `${event.target.files[0].name.split(".")[0]}`,
+        { type: "application/zip" }
+      );
+      setSelectedFile(zipFile);
+    } else {
+      setSelectedFile(event.target.files[0]);
+
+    }
   };
-  const sendfile = async () => {
-    setid("");
-    setgettingreq(true);
+  const createTextFile = async() => {
+    const element = document.createElement("a");
+    const randomFileName = `file_${Math.random().toString(36).substring(2, 15)}.txt`;
+    setSelectedFile();
+    const file = new File([textOptionInput],  randomFileName,{ type: "text/plain"});
+
+    await setSelectedFile(file);
+    sendfile(file);
+
+    setSelectedFile();
+  };
+  const sendfile = async (zipfile) => {
+    setId("");
+    setIsRequestInProgressForSender(true);
     const formData = new FormData();
-    formData.append("selectedFile", selectedFile);
+
+    formData.append("selectedFile", selectedFile ? selectedFile : zipfile);
+
     var enpassword = CryptoJS.AES.encrypt(
-      password.trim(),
+      senderPassword.trim(),
       import.meta.env.VITE_ENCRPYT_KEY_ENV
     );
     formData.append("password", enpassword);
+
+    if (isTextOptionOn){
+      formData.append("text",true);
+    }
+    else{
+      
+    }
 
     const res = await axios.post(
       "https://file-sharing-site-server.onrender.com/putFile",
@@ -58,13 +105,14 @@ function App() {
       }
     );
 
-    setid(res.data.id);
+    setId(res.data.id);
     if (res.data.id) {
-      setgettingreq(false);
+      setIsRequestInProgressForSender(false);
     }
   };
-  const receiveFile = async (id, password) => {
-    setgettingreqreceiver(true);
+  const receiveFileOLD = async (id, password) => {
+    setIsReceiverReturned(false);
+    setIsRequestInProgressForReceiver(true);
     const data = {
       id,
       password,
@@ -74,16 +122,16 @@ function App() {
       .post(`https://file-sharing-site-server.onrender.com/getFile`, data)
       .then(
         (res) => {
-          console.log("dawd");
-          setgettingreqreceiver(false);
+         
+          setIsRequestInProgressForReceiver(false);
 
           setinvalid(false);
 
           return res;
         },
         () => {
-          console.log("dawd");
-          setgettingreqreceiver(false);
+        
+          setIsRequestInProgressForReceiver(false);
           setinvalid(true);
         }
       );
@@ -94,35 +142,93 @@ function App() {
     document.body.appendChild(tag);
     tag.click();
     document.body.removeChild(tag);
-    setreturnedreceiver(true);
+    setIsReceiverReturned(true);
+  };
+
+  const receiveFile = async (id, password) => {
+    setIsReceiverReturned(false);
+    setIsRequestInProgressForReceiver(true);
+    const data = {
+      id,
+      password,
+    };
+
+    const res = await axios
+      .post(`https://file-sharing-site-server.onrender.com/getFile`, data)
+      .then(
+        (res) => {
+          setIsRequestInProgressForReceiver(false);
+
+          setinvalid(false);
+
+          return res;
+        },
+        () => {
+          setIsRequestInProgressForReceiver(false);
+          setinvalid(true);
+          
+        }
+      );
+
+      try{
+        const tag = document.createElement("a");
+        tag.href = res.data.link;
+        tag.style.display = "none";
+        document.body.appendChild(tag);
+        tag.click();
+        document.body.removeChild(tag);
+        setIsReceiverReturned(true);
+      }catch(error){
+        console.log('error when receiving the file');
+      }
+      finally{
+         setTimeout(() => {
+          setIsReceiverReturned(true);
+         }, 1500);  // find a way to make this dynamic
+
+        
+
+      }
   };
   const deleteFile = async (id) => {
     const res = await axios
       .post(`https://file-sharing-site-server.onrender.com/deleteFile`, {
         id: id,
       })
-      .then(setreturnedreceiver(false));
-  
-    };
+      .then(setIsReceiverReturned(false));
+  };
 
   useEffect(() => {
     const startup = async () => {
       const res = await axios.get(
-        "https://file-sharing-site-server.onrender.com/"
+        "http://file-sharing-site-server.onrender.com/"
       );
     };
     startup();
   }, []);
+
+  const downloadFile = async(link)=>{
+    const tag = document.createElement("a");
+    tag.href = link;
+    tag.style.display = "none";
+    document.body.appendChild(tag);
+
+    tag.click();
+    document.body.removeChild(tag);
+    setIsRequestInProgressForReceiver(false);
+  }
   return (
     <>
+
+    {confirmBoxAlive && <ConfirmBox downloadFile ={downloadFile} setConfirmBoxContents={setConfirmBoxContents} confirmBoxContents={confirmBoxContents} setConfirmBoxAlive = {setConfirmBoxAlive} setIsRequestInProgressForReceiver={setIsRequestInProgressForReceiver} />}
       <div id="wholepage">
         <div id="box">
           <div id="sender">
             <div id="outerwelcomebox">
               <div id="innerwelcomebox">
                 <div id="welcomebox">Welcome to File Sharing Web</div>
-                {!value && <div> want to receive a file? </div>}
-                {value && <div> want to send a file? </div>}
+                {!isSender && <div> want to receive a file? </div>}
+                {isSender && <div> want to send a file? </div>}
               </div>
               <div
                 className="sendbt12"
@@ -132,15 +238,15 @@ function App() {
                   sender.classList.toggle("active");
 
                   receiver.classList.toggle("active");
-                  setTimeout(() => setvalue(!value), 250);
+                  setTimeout(() => setIsSender(!isSender), 250);
                 }}
               >
-                {!value ? "Receive" : "Send"}
+                {!isSender ? "Receive" : "Send"}
               </div>
             </div>
           </div>
           <div id="receiver">
-            {!value && (
+            {!isSender && (
               <div className="senderbox">
                 <div className="h1sender">Sender</div>
                 <div className="nox">
@@ -152,30 +258,96 @@ function App() {
                     multiple
                     onChange={(event) => {
                       handleFileChange(event);
-             
-                  setfile(event.target.files[0].name);
+
+                      setfile(event.target.files[0].name);
                     }}
                   />
-                  <label for="file">Choose a file</label>
+                  {!isTextOptionOn ? (
+                    <label for="file" id="fileid">
+                      Choose a file
+                    </label>
+                  ) : (
+                    <input className="inputboxsender" id="text-File-Input" value={textOptionInput} onChange={(event)=>settextOptionInput(event.target.value)} />
+                  )}
+                  {!isMobile &&
+                  <>
+                  <svg
+                    id="options"
+                    onClick={() => {
+                      const textDrop = document.getElementById("text-drop");
+                      textDrop.style.animation =
+                        textDrop.style.animation.includes("appearTextDrop")
+                          ? "ss 0.3s both"
+                          : "appearTextDrop 0.3s both";
+                    }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e8eaed"
+                  >
+                    <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+                  </svg>
+                   
+                  <div id="text-drop">
+                    <div
+                      onClick={() => {
+                        setSelectedFile();
+                        setId();
+                        setfile();
+                    
+                        const fileLabel = document.getElementById('fileid');
+                        if (fileLabel){
+                          fileLabel.style.color = 'transparent';
+                        } 
+                        setTimeout(() => setTextOption(!isTextOptionOn), 300);
+                      }}
+                    >
+                      {!isTextOptionOn ? 'Write Text' : 'Send File'}
+                    </div>
+                  </div></>
+                   }{isMobile  &&
+           
+                   <svg
+                    id="options"
+                    onClick={() => {
+                      setSelectedFile();
+                        setId();
+                        setfile();
+                    
+                        const fileLabel = document.getElementById('fileid');
+                        if (fileLabel){
+                          fileLabel.style.color = 'transparent';
+                        } 
+                        setTimeout(() => setTextOption(!isTextOptionOn), 300);
+                    }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e8eaed"
+                  >
+                    <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+                  </svg>}
+     
                   <input
                     className="inputboxsender"
                     placeholder="Create Password "
-                    value={password}
-                    onChange={(event) => {
-                      setPassword(event.target.value);
+                    value={senderPassword}
+                    onChange={(event) => { 
+                      setSenderPassword(event.target.value);
                     }}
                   />
                   {previewFile && (
                     <div className="idofsender">
-                  
                       {previewFile.split(".")[0].length > 22
-                        ? (previewFile.split(".")[0].slice(0, 10) +
+                        ? previewFile.split(".")[0].slice(0, 10) +
                           "..." +
-                          previewFile.split(".")[1] ) 
-                        : previewFile }
+                          previewFile.split(".")[1]
+                        : previewFile}
                     </div>
                   )}
-                
+
                   {id && (
                     <>
                       {" "}
@@ -198,9 +370,7 @@ function App() {
                           <div id="copyclass">
                             <svg
                               id="copy"
-                              onClick={() => {
-                        
-                              }}
+                              onClick={() => {}}
                               xmlns="http://www.w3.org/2000/svg"
                               height="24px"
                               viewBox="0 -960 960 960"
@@ -233,10 +403,16 @@ function App() {
                 <div
                   className="sendbt1"
                   onClick={() => {
-                    password.trim() && previewFile ? sendfile() : null;
+                    if (isTextOptionOn){
+                      senderPassword.trim() ? createTextFile() : null;
+                     }
+                     else{
+                    senderPassword.trim() && previewFile ? sendfile() : null;
+                     }
+             
                   }}
                 >
-                  {gettingreq ? (
+                  {isRequestInProgressForSender ? (
                     <svg
                       id="roundandround"
                       xmlns="http://www.w3.org/2000/svg"
@@ -253,35 +429,35 @@ function App() {
                 </div>
               </div>
             )}
-            {value && (
+            {isSender && (
               <div className="senderbox">
                 <div className="h1sender">Receiver</div>
                 <div className="nox">
                   <input
                     className="inputboxsender"
                     placeholder="Enter ID "
-                    value={idofreciver}
+                    value={receiverId}
                     onChange={(event) => {
-                      setidofreciver(event.target.value);
+                      setReceiverId(event.target.value);
                     }}
                   />
                   <input
                     className="inputboxsender"
                     placeholder="Enter Password "
-                    value={passofreciver}
+                    value={receiverPassword}
                     onChange={(event) => {
-                      setPassofreciver(event.target.value);
+                      setReceiverPassword(event.target.value);
                     }}
                   />
                 </div>
                 {invalid ? <div id="empty">Invalid ID or Password</div> : null}
 
-                {irr && !invalid && (
+                {isReceiverReturned && !invalid && (
                   <>
                     {" "}
                     <div id="tooltip">
                       <svg
-                       onClick={() => deleteFile(idofreciver)}
+                        onClick={() => deleteFile(receiverId)}
                         id="svgofsender"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
@@ -297,12 +473,12 @@ function App() {
                 <div
                   className="sendbt1"
                   onClick={() =>
-                    idofreciver && passofreciver
-                      ? receiveFile(idofreciver, passofreciver)
+                    receiverId && receiverPassword
+                      ?   receiveFileOLD(receiverId,receiverPassword) 
                       : null
                   }
                 >
-                  {gettingreqreceiver ? (
+                  {IsRequestInProgressForReceiver ? (
                     <svg
                       id="roundandround"
                       xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +506,7 @@ function App() {
         <input
           placeholder="Password"
           onChange={(event) => {
-            setPassword(event.target.value);
+            setSenderPassword(event.target.value);
           }}
         />
         <input type="file" onChange={handleFileChange} />
@@ -341,7 +517,7 @@ function App() {
         <div
           id="sendbt"
           onClick={() => {
-            password ? sendfile() : null;
+            senderPassword ? sendfile() : null;
           }}
         >
           <div>Send</div>
@@ -352,24 +528,24 @@ function App() {
         <input
           placeholder="Id"
           onChange={(event) => {
-            setidofreciver(event.target.value);
+            setreceiverId(event.target.value);
           }}
         />
         <input
           placeholder="Password"
           onChange={(event) => {
-            setPassofreciver(event.target.value);
-            console.log(passofreciver);
+            setReceiverPassword(event.target.value);
+            console.log(receiverPassword);
           }}
         />
-        {irr && (
+        {isReceiverReturned && (
           <a onClick={() => deleteFile(id)}>click to delete from server</a>
         )}
 
         <div
           id="sendbt"
           onClick={() => {
-            receiveFile(idofreciver, passofreciver);
+            receiveFile(receiverId, receiverPassword);
           }}
         >
           <div>Receive</div>
